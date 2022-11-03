@@ -18,8 +18,8 @@ public class Authorization extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/auth/login").permitAll();
-
+                .antMatchers("/api/auth/register").permitAll()
+                .antMatchers("/auth/login").hasAnyAuthority("CLIENT","ADMIN");
         http.formLogin()
 
                 .usernameParameter("email")
