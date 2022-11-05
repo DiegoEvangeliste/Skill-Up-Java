@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Configuration
+/*@Configuration
 public class Authentication extends GlobalAuthenticationConfigurerAdapter {
     @Autowired
     UserRepository userRepository;
@@ -38,4 +38,4 @@ public class Authentication extends GlobalAuthenticationConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-}
+}*/

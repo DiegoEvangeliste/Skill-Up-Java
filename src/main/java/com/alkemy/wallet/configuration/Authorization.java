@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@EnableWebSecurity
+/*@EnableWebSecurity
 @Configuration
 public class Authorization extends WebSecurityConfigurerAdapter {
     @Override
@@ -53,4 +53,4 @@ public class Authorization extends WebSecurityConfigurerAdapter {
 
         }
     }
-}
+}*/
