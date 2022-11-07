@@ -19,7 +19,7 @@
 - The names of attributes/fields from Java classes must be written using camel case. Example: firstName.
 - The name of columns in the entities must be written using underscore and uppercase. Example: FIRST_NAME. The name of the tables is always in plural, but the entity name should be in singular.
 - Exceptions should be handled by an implementation of ControllerAdvice. 
-- Messages to user can't be hardcoded them should be handled. Some refs [here](https://looksok.wordpress.com/2014/07/05/string-externalization-in-spring-3-1-with-messagesource-no-web-xml/) and [here](https://zetcode.com/spring/messagesource/). 
+- Messages to userLogin can't be hardcoded them should be handled. Some refs [here](https://looksok.wordpress.com/2014/07/05/string-externalization-in-spring-3-1-with-messagesource-no-web-xml/) and [here](https://zetcode.com/spring/messagesource/). 
 - If you add a new endpoint, make sure to set the role access for it in the SecurityConfig class.
 
 
