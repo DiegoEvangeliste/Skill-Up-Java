@@ -1,4 +1,4 @@
-package com.alkemy.wallet.configuration;
+package com.alkemy.wallet.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

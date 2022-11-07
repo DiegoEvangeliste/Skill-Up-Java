@@ -1,4 +1,4 @@
-package com.alkemy.wallet.configuration;
+package com.alkemy.wallet.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
