@@ -5,11 +5,14 @@ import com.alkemy.wallet.dto.TransactionDTO;
 import com.alkemy.wallet.exception.BankException;
 import com.alkemy.wallet.model.TypeEnum;
 import com.alkemy.wallet.model.entity.AccountEntity;
+import com.alkemy.wallet.model.entity.UserEntity;
 import com.alkemy.wallet.repository.BankDAO;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,46 +30,51 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public ResponseEntity<Object> saveDeposit(TransactionDTO transaction) {
-        if(!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency()) ) {
-            throw  new BankException("Currency not permitted");
+        if (!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency())) {
+            throw new BankException("Currency not permitted");
         }
-        if(!transaction.getType().equalsIgnoreCase(DEPOSIT.getType())) {
+        if (!transaction.getType().equalsIgnoreCase(DEPOSIT.getType())) {
             throw new BankException("Incorrect operation, only can be a deposit");
         }
-        AccountEntity account = bankDAO.getAccount(1L, transaction.getCurrency().toUpperCase());
+        UserEntity user = bankDAO.findUserByEmail(returnUserName());
+        AccountEntity account = bankDAO.getAccount(user.getUserId(), transaction.getCurrency().toUpperCase());
         return saveTransaction(transaction, DEPOSIT, account);
     }
 
     @Override
     public ResponseEntity<Object> savePayment(TransactionDTO transaction) {
-        if(!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency()) ) {
-            throw  new BankException("Currency not permitted");
+        if (!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency())) {
+            throw new BankException("Currency not permitted");
         }
-        if(!transaction.getType().equalsIgnoreCase(PAYMENT.getType())) {
+        if (!transaction.getType().equalsIgnoreCase(PAYMENT.getType())) {
             throw new BankException("Incorrect operation, only can be a payment");
         }
-        AccountEntity account = bankDAO.getAccount(1L, transaction.getCurrency().toUpperCase());
+        UserEntity user = bankDAO.findUserByEmail(returnUserName());
+        AccountEntity account = bankDAO.getAccount(user.getUserId(), transaction.getCurrency().toUpperCase());
         return saveTransaction(transaction, PAYMENT, account);
     }
 
     @Override
     public ResponseEntity<Object> sendArs(TransactionDTO transaction) {
-        if(!transaction.getType().equalsIgnoreCase(INCOME.getType())) {
+        if (!transaction.getType().equalsIgnoreCase(INCOME.getType())) {
             throw new BankException("Incorrect operation, only can be an income");
         }
 
         List<IBalance> transactionEntity = bankDAO.getBalance();
-        System.out.println("*************** " + transactionEntity.get(0).getSumIncome());
-
+        UserEntity user = bankDAO.findUserByEmail(returnUserName());
         Optional<AccountEntity> destinationAccount = bankDAO.getAccountById(transaction.getDestinationAccountId());
-        //Falta obtener userId del usuario autenticado
-        Optional<AccountEntity> sourceAccount = bankDAO.getAccountById(1L);
-        saveTransaction(transaction, PAYMENT , sourceAccount.orElseThrow(() -> new BankException("Source account does not exist")));
+        AccountEntity sourceAccount = bankDAO.getAccount(user.getUserId(), transaction.getCurrency().toUpperCase());
+        saveTransaction(transaction, PAYMENT, sourceAccount);
         return saveTransaction(transaction, INCOME, destinationAccount.orElseThrow(() -> new BankException("Destination account does not exist")));
     }
 
     private ResponseEntity<Object> saveTransaction(TransactionDTO transaction, TypeEnum type, AccountEntity accountEntity) {
         bankDAO.createTransaction(transaction, type, accountEntity);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    public String returnUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 }
