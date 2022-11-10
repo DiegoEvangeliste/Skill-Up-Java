@@ -1,0 +1,6 @@
+{
+  "type": "DEPOSIT",
+  "description": "prueba",
+  "amount": 2000,
+  "currency": "ars"
+}

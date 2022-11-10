@@ -30,12 +30,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public ResponseEntity<Object> saveDeposit(TransactionDTO transaction) {
-        if (!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency())) {
-            throw new BankException("Currency not permitted");
-        }
-        if (!transaction.getType().equalsIgnoreCase(DEPOSIT.getType())) {
-            throw new BankException("Incorrect operation, only can be a deposit");
-        }
+        isTransactionAllowed(transaction, DEPOSIT, "Incorrect operation, only can be a deposit");
         UserEntity user = bankDAO.findUserByEmail(returnUserName());
         AccountEntity account = bankDAO.getAccount(user.getUserId(), transaction.getCurrency().toUpperCase());
         return saveTransaction(transaction, DEPOSIT, account);
@@ -43,12 +38,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public ResponseEntity<Object> savePayment(TransactionDTO transaction) {
-        if (!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency())) {
-            throw new BankException("Currency not permitted");
-        }
-        if (!transaction.getType().equalsIgnoreCase(PAYMENT.getType())) {
-            throw new BankException("Incorrect operation, only can be a payment");
-        }
+        isTransactionAllowed(transaction, PAYMENT, "Incorrect operation, only can be a payment");
         UserEntity user = bankDAO.findUserByEmail(returnUserName());
         AccountEntity account = bankDAO.getAccount(user.getUserId(), transaction.getCurrency().toUpperCase());
         return saveTransaction(transaction, PAYMENT, account);
@@ -76,5 +66,14 @@ public class TransactionServiceImpl implements ITransactionService {
     public String returnUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
+    }
+
+    private static void isTransactionAllowed(TransactionDTO transaction, TypeEnum deposit, String message) {
+        if (!transaction.getCurrency().equalsIgnoreCase(ARS.getCurrency()) && !transaction.getCurrency().equalsIgnoreCase(USD.getCurrency())) {
+            throw new BankException("Currency not permitted");
+        }
+        if (!transaction.getType().equalsIgnoreCase(deposit.getType())) {
+            throw new BankException(message);
+        }
     }
 }

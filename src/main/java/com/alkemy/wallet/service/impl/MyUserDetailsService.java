@@ -4,6 +4,9 @@ import com.alkemy.wallet.model.RoleEnum;
 import com.alkemy.wallet.model.TypeEnum;
 import com.alkemy.wallet.model.entity.UserEntity;
 import com.alkemy.wallet.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.alkemy.wallet.model.RoleEnum.*;
@@ -28,7 +32,6 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findUserByEmail(username);
-        System.out.println(userEntity.getAuthorities());
         return new User(userEntity.getUsername(), userEntity.getPassword(), userEntity.getAuthorities());
     }
 }
