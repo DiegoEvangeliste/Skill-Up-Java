@@ -5,6 +5,7 @@ import com.alkemy.wallet.dto.TransactionDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,6 +50,7 @@ public class TransactionsDepositTest {
     }
 
 
+    @DisplayName("Succesful Deposit")
     @Test
     public void transactionsDepositReturns201HttpCreated() throws Exception {
         UserDetails dummy = new User("foo@foo.com", "foo", new ArrayList<>());
@@ -62,4 +64,47 @@ public class TransactionsDepositTest {
                 .andDo(print())
                 .andExpect(status().isCreated());
     }
+    @DisplayName("Failure by zero amount")
+    @Test
+    public void transactionsDepositReturns403ErrorDueToZeroAmount() throws Exception {
+        UserDetails dummy = new User("foo@foo.com", "foo", new ArrayList<>());
+        String jwtToken = jwtUtil.generateToken(dummy);
+        String json = objectMapper.writeValueAsString(new TransactionDTO(1L, DEPOSIT.getType(), "deposito", 0.0, "ARS", LocalDateTime.now()));
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/transactions/deposit")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+    @DisplayName("Wrong Currency")
+    @Test
+    public void transactionsDepositReturns403ErrorDueToWrongCurrency() throws Exception {
+        UserDetails dummy = new User("foo@foo.com", "foo", new ArrayList<>());
+        String jwtToken = jwtUtil.generateToken(dummy);
+        String json = objectMapper.writeValueAsString(new TransactionDTO(1L, DEPOSIT.getType(), "deposito", 300.0, "EUR", LocalDateTime.now()));
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/transactions/deposit")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+    @DisplayName("Null user Id in destinationAccount")
+    @Test
+    public void transactionsDepositReturns403ErrorDueToNullId() throws Exception {
+        UserDetails dummy = new User("foo@foo.com", "foo", new ArrayList<>());
+        String jwtToken = jwtUtil.generateToken(dummy);
+        String json = objectMapper.writeValueAsString(new TransactionDTO(null, DEPOSIT.getType(), "deposito", 300.0, "ARS", LocalDateTime.now()));
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/transactions/deposit")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+
 }
